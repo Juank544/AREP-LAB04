@@ -49,7 +49,23 @@ End with an example of getting some data out of the system or using it for a lit
 
 ## Deployment
 
-Add additional notes about how to deploy this on a live system
+Para generar un par de llaves debe usar el siguiente comando (Nota: use "localhost" como nombre del certificado)
+
+```
+keytool -genkeypair -alias ecikeypair -keyalg RSA -keysize 2048 -storetype PKCS12 -keystore ecikeystore.p12 -validity 3650
+```
+
+Luego para exportar el certificado a un archivo use el siguiente comando
+
+```
+keytool -export -keystore ./ecikeystore.p12 -storetype pkcs12 -alias ecikeypair -file ecicert.cer
+```
+
+Y finalmente para importar el certificado a un TrustStore
+
+```
+keytool -import -file ./ecicert.cer -alias firstCA -keystore myTrustStore
+```
 
 ## Built With
 
