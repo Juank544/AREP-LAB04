@@ -2,7 +2,10 @@ package co.edu.escuelaing;
 
 import co.edu.escuelaing.model.User;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import spark.Request;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import static spark.Spark.*;
@@ -31,23 +34,39 @@ public class Login
         });
 
         post("/login", (request,response) ->{
-            request.session(true);
-            User user = gson.fromJson(request.body(), User.class);
-            if (users.containsKey(user.getEmail())){
-                if (user.getPassword().equals(users.get(user.getPassword()))){
-                    request.session().attribute("User", user.getEmail());
-                    request.session().attribute("isLogged", true);
-                }
-                else {
-                    return "Contraseña incorrecta";
-                }
+            JsonObject json = new JsonObject();
+            if (request.body() != null){
+                ArrayList<String> responses = login(request);
+                json.addProperty("status", 200);
+                json.addProperty("result", responses.get(0));
+                json.addProperty("response", responses.get(1));
+                return json;
             }
-            else {
-                return "Usuario incorrecto";
-            }
-            response.redirect("/hello");
-            return null;
+            json.addProperty("status", 400);
+            json.addProperty("result", "Error");
+            json.addProperty("response", "Cannot log in");
+            return json;
         });
+    }
+
+    private static ArrayList<String> login(Request request){
+        ArrayList<String> reponses = new ArrayList<String>();
+        User user = gson.fromJson(request.body(), User.class);
+
+        if (users.containsKey(user.getEmail())){
+            if (users.get(user.getEmail()).equals(user.getPassword())){
+                request.session(true);
+                request.session().attribute("User", user.getEmail());
+                request.session().attribute("isLogged", true);
+                reponses.add("You're logged");
+                return reponses;
+            }
+            reponses.add("Password incorrect");
+            return reponses;
+            }
+        reponses.add("Email incorrect");
+        return reponses;
+        }
     }
 
     private static void addUsers(){
