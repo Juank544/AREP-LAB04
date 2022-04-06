@@ -1,1 +1,3 @@
 co\edu\escuelaing\App.class
+co\edu\escuelaing\model\User.class
+co\edu\escuelaing\SecureURLReader.class
